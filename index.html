@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AppLocker Policy Helper</title>
+    <link rel="stylesheet" href="src/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-art" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div>
+          <p class="eyebrow">Endpoint policy utility</p>
+          <h1>AppLocker Policy Helper</h1>
+          <p class="subtitle">Generate path-based AppLocker XML rules for Intune Custom OMA-URI profiles without hand-editing GUIDs.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Rule Input</h2>
+          <button id="loadSample" type="button">Load sample</button>
+        </div>
+
+        <label for="xmlInput">Existing RuleCollection XML</label>
+        <textarea id="xmlInput" spellcheck="false" placeholder="Paste your <RuleCollection ...> XML here"></textarea>
+
+        <div class="grid">
+          <label>
+            Collection
+            <select id="collectionType">
+              <option value="EXE">EXE</option>
+              <option value="DLL">DLL</option>
+              <option value="MSI">MSI</option>
+              <option value="Script">Script</option>
+              <option value="StoreApps">StoreApps</option>
+            </select>
+          </label>
+
+          <label>
+            Action
+            <select id="action">
+              <option value="Allow">Allow</option>
+              <option value="Deny">Deny</option>
+            </select>
+          </label>
+
+          <label>
+            User/group SID
+            <input id="sid" value="S-1-1-0">
+          </label>
+
+          <label>
+            Rule name
+            <input id="ruleName" value="Allow line-of-business app">
+          </label>
+        </div>
+
+        <details class="hint">
+          <summary>User/group SID tips</summary>
+          <div>
+            <p><strong>S-1-1-0</strong> means Everyone. Use it when the rule should apply to all users.</p>
+            <p><strong>S-1-5-32-544</strong> means local Administrators. Default AppLocker policies usually allow administrators to run everything.</p>
+            <p>For a specific AD group, get the SID with PowerShell:</p>
+            <pre><code>Get-ADGroup "Group Name" | Select-Object Name,SID</code></pre>
+          </div>
+        </details>
+
+        <label for="pathInput">Path</label>
+        <input id="pathInput" value="C:\LineOfBusiness\App\*">
+
+        <label for="description">Description</label>
+        <input id="description" value="Allows a line-of-business application path.">
+
+        <div class="actions">
+          <button id="addRule" type="button">Add FilePathRule</button>
+          <button id="validateXml" type="button">Validate XML</button>
+          <button id="copyXml" type="button">Copy XML</button>
+        </div>
+        <div class="inline-result" id="inlineResult" aria-live="polite"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Output</h2>
+          <button id="clearOutput" type="button">Clear</button>
+        </div>
+
+        <label for="omaUri">Suggested OMA-URI</label>
+        <input id="omaUri" readonly>
+
+        <label for="xmlOutput">Final XML</label>
+        <textarea id="xmlOutput" spellcheck="false" placeholder="Generated XML will appear here"></textarea>
+      </section>
+    </main>
+
+    <script src="src/app.js"></script>
+  </body>
+</html>
