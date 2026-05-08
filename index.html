@@ -1,104 +1,126 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AppLocker Policy Helper</title>
+    <meta name="description" content="Client-side helper to create AppLocker RuleCollection XML for Microsoft Intune Custom OMA-URI profiles.">
+    <title>AppLocker Intune Helper</title>
     <link rel="stylesheet" href="src/styles.css">
   </head>
   <body>
     <main class="shell">
       <header class="hero">
-        <div class="hero-art" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div>
-          <p class="eyebrow">Endpoint policy utility</p>
-          <h1>AppLocker Policy Helper</h1>
-          <p class="subtitle">Generate path-based AppLocker XML rules for Intune Custom OMA-URI profiles without hand-editing GUIDs.</p>
-        </div>
-        <div class="status" id="status">Ready</div>
+        <nav class="topbar">
+          <div class="brand">
+            <img class="brand-logo" src="assets/rsb-mark.svg" alt="RSB logo">
+            <span data-i18n="brand">AppLocker Intune Helper</span>
+          </div>
+          <div class="lang-toggle" aria-label="Language">
+            <button type="button" data-lang="pt" class="active">PT</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+        </nav>
+
+        <section class="hero-grid clean">
+          <div>
+            <div class="signature-line">
+              <span>RSB</span>
+              <span>Automation na veia</span>
+            </div>
+            <p class="eyebrow" data-i18n="eyebrow">Utilit&aacute;rio para Intune</p>
+            <h1 data-i18n="title">Gere regras AppLocker sem editar XML no bra&ccedil;o.</h1>
+            <p class="subtitle" data-i18n="subtitle">Cole uma RuleCollection existente, adicione regras FilePath com GUID e copie o XML final para um perfil Custom OMA-URI do Intune.</p>
+          </div>
+
+          <div class="hero-note" data-i18n="heroCardHint">Tudo roda localmente no navegador.</div>
+        </section>
       </header>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Rule Input</h2>
-          <button id="loadSample" type="button">Load sample</button>
-        </div>
-
-        <label for="xmlInput">Existing RuleCollection XML</label>
-        <textarea id="xmlInput" spellcheck="false" placeholder="Paste your <RuleCollection ...> XML here"></textarea>
-
-        <div class="grid">
-          <label>
-            Collection
-            <select id="collectionType">
-              <option value="EXE">EXE</option>
-              <option value="DLL">DLL</option>
-              <option value="MSI">MSI</option>
-              <option value="Script">Script</option>
-              <option value="StoreApps">StoreApps</option>
-            </select>
-          </label>
-
-          <label>
-            Action
-            <select id="action">
-              <option value="Allow">Allow</option>
-              <option value="Deny">Deny</option>
-            </select>
-          </label>
-
-          <label>
-            User/group SID
-            <input id="sid" value="S-1-1-0">
-          </label>
-
-          <label>
-            Rule name
-            <input id="ruleName" value="Allow line-of-business app">
-          </label>
-        </div>
-
-        <details class="hint">
-          <summary>User/group SID tips</summary>
-          <div>
-            <p><strong>S-1-1-0</strong> means Everyone. Use it when the rule should apply to all users.</p>
-            <p><strong>S-1-5-32-544</strong> means local Administrators. Default AppLocker policies usually allow administrators to run everything.</p>
-            <p>For a specific AD group, get the SID with PowerShell:</p>
-            <pre><code>Get-ADGroup "Group Name" | Select-Object Name,SID</code></pre>
+      <section class="workspace">
+        <section class="panel input-panel">
+          <div class="panel-header">
+            <div>
+              <h2 data-i18n="ruleInput">Entrada da regra</h2>
+              <p data-i18n="ruleInputHint">Comece com uma RuleCollection existente ou carregue um exemplo.</p>
+            </div>
+            <button id="loadSample" type="button" data-i18n="loadSample">Carregar exemplo</button>
           </div>
-        </details>
 
-        <label for="pathInput">Path</label>
-        <input id="pathInput" value="C:\LineOfBusiness\App\*">
+          <label for="xmlInput" data-i18n="existingXml">RuleCollection XML existente</label>
+          <textarea id="xmlInput" spellcheck="false" placeholder="Cole seu XML &lt;RuleCollection ...&gt; aqui"></textarea>
 
-        <label for="description">Description</label>
-        <input id="description" value="Allows a line-of-business application path.">
+          <div class="grid two">
+            <label>
+              <span data-i18n="collection">Cole&ccedil;&atilde;o</span>
+              <select id="collectionType">
+                <option value="EXE">EXE</option>
+                <option value="DLL">DLL</option>
+                <option value="MSI">MSI</option>
+                <option value="Script">Script</option>
+                <option value="StoreApps">StoreApps</option>
+              </select>
+            </label>
 
-        <div class="actions">
-          <button id="addRule" type="button">Add FilePathRule</button>
-          <button id="validateXml" type="button">Validate XML</button>
-          <button id="copyXml" type="button">Copy XML</button>
-        </div>
-        <div class="inline-result" id="inlineResult" aria-live="polite"></div>
-      </section>
+            <label>
+              <span data-i18n="action">A&ccedil;&atilde;o</span>
+              <select id="action">
+                <option value="Allow">Permitir</option>
+                <option value="Deny">Negar</option>
+              </select>
+            </label>
+          </div>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Output</h2>
-          <button id="clearOutput" type="button">Clear</button>
-        </div>
+          <div class="grid two">
+            <label>
+              <span data-i18n="sid">User/group SID</span>
+              <input id="sid" value="S-1-1-0">
+            </label>
 
-        <label for="omaUri">Suggested OMA-URI</label>
-        <input id="omaUri" readonly>
+            <label>
+              <span data-i18n="ruleName">Nome da regra</span>
+              <input id="ruleName" value="Permitir aplica&ccedil;&atilde;o corporativa">
+            </label>
+          </div>
 
-        <label for="xmlOutput">Final XML</label>
-        <textarea id="xmlOutput" spellcheck="false" placeholder="Generated XML will appear here"></textarea>
+          <details class="hint">
+            <summary data-i18n="sidTips">Dicas sobre SID</summary>
+            <div>
+              <p data-i18n="sidTipEveryone">S-1-1-0 significa Everyone/Todos.</p>
+              <p data-i18n="sidTipAdmins">S-1-5-32-544 significa Administradores locais.</p>
+              <p data-i18n="sidTipCommand">Para um grupo do AD, consulte o SID com PowerShell:</p>
+              <pre><code>Get-ADGroup "Nome do Grupo" | Select-Object Name,SID</code></pre>
+            </div>
+          </details>
+
+          <label for="pathInput" data-i18n="path">Caminho</label>
+          <input id="pathInput" value="C:\LineOfBusiness\App\*">
+
+          <label for="description" data-i18n="description">Descri&ccedil;&atilde;o</label>
+          <input id="description" value="Permite execu&ccedil;&atilde;o de aplica&ccedil;&atilde;o corporativa.">
+
+          <div class="actions">
+            <button id="addRule" type="button" class="primary" data-i18n="addRule">Adicionar FilePathRule</button>
+            <button id="validateXml" type="button" data-i18n="validateXml">Validar XML</button>
+            <button id="copyXml" type="button" data-i18n="copyXml">Copiar XML</button>
+          </div>
+          <div class="inline-result" id="inlineResult" aria-live="polite" data-i18n="ready">Pronto</div>
+        </section>
+
+        <section class="panel output-panel">
+          <div class="panel-header">
+            <div>
+              <h2 data-i18n="output">Sa&iacute;da</h2>
+              <p data-i18n="outputHint">Use o OMA-URI sugerido e cole o XML final no Intune.</p>
+            </div>
+            <button id="clearOutput" type="button" data-i18n="clear">Limpar</button>
+          </div>
+
+          <label for="omaUri" data-i18n="omaUri">OMA-URI sugerido</label>
+          <input id="omaUri" readonly>
+
+          <label for="xmlOutput" data-i18n="finalXml">XML final</label>
+          <textarea id="xmlOutput" spellcheck="false" placeholder="O XML gerado aparece aqui"></textarea>
+        </section>
       </section>
     </main>
 
